@@ -3,6 +3,8 @@ html
   head
     title= title
     link(rel='stylesheet', href='/css/bootstrap.min.css')
+    script(src='/javascripts/jquery-3.1.1.min.js')
+    script(src='/javascripts/bootstrap.min.js') 
   body
-    h1(align='middle') This is Title
+    h1(align='middle')= title
     block content

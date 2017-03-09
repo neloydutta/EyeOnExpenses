@@ -1,0 +1,143 @@
+<html>
+    <head>
+        <title>EyeOnExpenses</title>
+        <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+        <script src="/javascripts/jquery-3.1.1.min.js"></script>
+        <script src="/javascripts/bootstrap.min.js"></script>
+        <script src="/javascripts/angular.min.js"></script>
+        <script src="/javascripts/home_front_script.js"></script>
+    </head>
+    <body class="container-fluid" ng-app="eoe_app" ng-controller="eoe_ctrl" id="body">
+        <nav class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span> 
+                    </button>
+                    <a class="navbar-brand" href="#">Eye On Expenses</a>
+                </div>
+                <div class="collapse navbar-collapse" id="myNavbar">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
+                        <li><a data-toggle="tab" href="#page1">Page 1</a></li>
+                        <li><a data-toggle="tab" href="#page2">Page 2</a></li> 
+                        <li><a data-toggle="tab" href="#page3">Page 3</a></li> 
+                    </ul>
+                </div>
+            </div>
+        </nav>
+            <div class="tab-content">
+                <div id="home" class="tab-pane fade in active">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>Store-Name</th>
+                                    <th>Balance</th>
+                                    <th></th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="store in store_list.stores">
+                                        <td>{{ store.name }}</td>
+                                        <td style="font-family:consolas;">{{ store.balance }}</td>
+                                        <td><button type="button" class="btn btn-default btn-sm" id={{store.name}} data-toggle="modal" data-target="#addbal" ng-click="add_balance_store = store.name">
+                                                <span class="glyphicon glyphicon-plus-sign"></span> Add
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-7">
+                            <p>Total Balance: <span style="font-family:consolas; font-size: 20; font-weight: bold;">{{total_balance}}</span></p>
+                        </div>
+                        <div class="col-xs-5">
+                            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#transferbal">
+                                <span class="glyphicon glyphicon-sort"></span> Transfer Balance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="page1" class="tab-pane fade">
+                    Page1
+                </div>
+                <div id="page2" class="tab-pane fade">
+                    Page2
+                </div>
+                <div id="page3" class="tab-pane fade">
+                    Page3
+                </div>
+            </div>
+        <div id="transferbal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Transfer Balance (between stores)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                From Store:
+                            </div>
+                            <div class="col-xs-7">
+                                <select class="input-sm" ng-model="transfer_fromstore">
+                                    <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                To Store:
+                            </div>
+                            <div class="col-xs-7">
+                                <select class="input-sm" ng-model="transfer_tostore">
+                                    <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Transfer Amount:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="input-sm" type="number" ng-model="transfer_amt">
+                            </div>
+                        </div>
+                        <br/>
+                        <p>Selected stores:<br/> [from: {{transfer_fromstore}}, to: {{transfer_tostore}}]</p>
+                        <div id="tbalert_placeholder"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" ng-click="transfer_balance()">Transfer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="addbal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Balance to Store</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>Some text in the modal.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" ng-click="transfer_balance()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="alert_placeholder"></div>
+    </body>
+</html>
