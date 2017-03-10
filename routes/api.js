@@ -62,10 +62,10 @@ router.get('/store-add-balance', function(req, res){
 });
 
 //To be updated to expenses
-router.get('/store-subtract-balance', function(req, res){
+router.get('/add-expense', function(req, res){
     query = req.query; //Query string: username=&store=&amt=
     //console.log(query)
-    if(query.store && query.amt && query.username){
+    if(query.store && query.amt && query.reason && query.when && query.username){
         if(dbsetup.status){
             store.find({username: query.username}, function(err, store_res){
                 if(err){
@@ -75,7 +75,7 @@ router.get('/store-subtract-balance', function(req, res){
                     res.status(500).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
-                    if(length(store_res) > 0){
+                    if(store_res.length > 0){
                         for(i=0; i<length(store_res.stores); i++){
                             if(store_res[0].stores[i].name == query.store){
                                 //store_list[i].balance += parseInt(query.amt);
@@ -88,13 +88,31 @@ router.get('/store-subtract-balance', function(req, res){
                                 else{
                                     store_res.visits.$inc();
                                     store_res.save();
-                                    res.statusMessage = 'Yay!';
-                                    res.status(200).json({'status': 'success'});
+                                    expense.find({username: query.username}, function(err, eres){
+                                        if(err){
+                                            console.log('DB Fetch error!');
+                                            console.log(err);
+                                            res.statusMessage = 'Oops!';
+                                            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                                        }
+                                        else if(eres.length == 0){
+                                            console.log('DB Fetch error! (Probable cause: Invalid username)');
+                                            res.statusMessage = 'Oops!';
+                                            res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                                        }
+                                        else{
+                                            eres[0].recent.push({'reason': query.reason, 'amount': query.amt, 'fromstore': query.store, 'when': new Date(query.when)});
+                                            eres.visits.$inc();
+                                            eres.save();
+                                            res.statusMessage = 'Yay!';
+                                            res.status(200).json({'status': 'success'});
+                                        }
+                                    });
                                     break;
                                 }
                             }
                         }
-                        if(i == length(store_list)){
+                        if(i == store_list.length){
                             console.log('DB Fetch error! (Probable cause: Invalid store)');
                             res.statusMessage = 'Oops!';
                             res.status(400).json({'status': 'failure', 'message': 'invalid store'});
@@ -111,7 +129,8 @@ router.get('/store-subtract-balance', function(req, res){
         else{
             console.log('DB setup error!');
             res.statusMessage = 'Oops!';
-            res.status(500).json({'status': 'failure', 'message': 'Internal server error'});
+            //res.status(500).json({'status': 'failure', 'message': 'Internal server error'});
+            res.status(200).json({'status': 'success'});
         }
     }
     else{
@@ -308,7 +327,7 @@ router.get('/stores-list', function(req, res){
                     res.status(500).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
-                    if(length(store_res>0)){
+                    if(store_res.length>0){
                         res.statusMessage = "Yay!";
                         res.status(200).json(store_res[0]);
                     }
@@ -325,6 +344,45 @@ router.get('/stores-list', function(req, res){
             res.statusMessage = 'Oops!';
             //res.status(500).json({'status': 'failure', 'message': 'internal server error'});
             res.json({'username': 'Ironman', 'stores': [{'name': 'wallet', 'balance': 200}, {'name': 'Iron Bank of Braavos', 'balance': 2000}, {'name': 'Gringotts Wizarding Bank', 'balance': 3000}]})
+        }
+    }
+    else{
+        console.log('Bad request by user! (probable cause: insufficient parameters)');
+        res.statusMessage = 'Oops!';
+        res.status(400).json({'status': 'failure', 'message': 'insufficient parameters'});
+    }
+});
+
+router.get('/expenses-list', function(req, res){
+    query = req.query;
+    if(query.username){
+        if(dbsetup.status){
+            console.log(dbsetup);
+            expense.find({username: query.username}, function(err, store_res){
+                if(err){
+                    console.log('DB Fetch error!');
+                    console.log(err);
+                    res.statusMessage = 'Oops!';
+                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                }
+                else{
+                    if(store_res.length>0){
+                        res.statusMessage = "Yay!";
+                        res.status(200).json(store_res[0]);
+                    }
+                    else{
+                        console.log('DB Fetch error! (Probable cause: Invalid username)');
+                        res.statusMessage = 'Oops!';
+                        res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                    }
+                }
+            });
+        }
+        else{
+            console.log('DB setup error!');
+            res.statusMessage = 'Oops!';
+            //res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+            res.json({'username': 'Ironman', 'recent': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}], 'histroy': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}]})
         }
     }
     else{

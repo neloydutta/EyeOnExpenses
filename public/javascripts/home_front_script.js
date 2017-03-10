@@ -11,6 +11,11 @@ app.controller('eoe_ctrl', function($scope, $http) {
     $scope.new_store_name = "";
     $scope.new_store_amt = 0;
     $scope.rm_store_name = "";
+    $scope.ne_reason = "";
+    $scope.ne_amount = 0;
+    $scope.ne_fromstore = "";
+    $scope.ne_when = "";
+    $scope.expenses = {};
     $scope.retrieve_storelist = function(){
         $http.get('/api/stores-list?username='+$scope.username).then(
             function(response) {
@@ -18,7 +23,20 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 $scope.calculate_totalbalance();
             },
             function(error){
-                alert(error);
+                console.log(error.data.message);
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Something doesn\'t seem to be right!');
+        });
+    }
+
+    $scope.retrieve_expenselist = function(){
+        $http.get('/api/expenses-list?username='+$scope.username).then(
+            function(response) {
+                $scope.expenses = response.data;
+                console.log($scope.expenses);
+            },
+            function(error){
+                console.log(error.data.message);
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Something doesn\'t seem to be right!');
         });
     }
 
@@ -44,10 +62,8 @@ app.controller('eoe_ctrl', function($scope, $http) {
             function(response){
                 if(response.data.status == 'success'){
                     for(i=0; i<$scope.store_list.stores.length; i++){
-                        console.log($scope.store_list.stores[i].name+" "+$scope.add_balance_store);
                         if($scope.store_list.stores[i].name == $scope.add_balance_store){
                             $scope.store_list.stores[i].balance += $scope.store_add_amt;
-                            console.log($scope.store_list.stores[i].name);
                         }
                     }
                     $scope.store_add_amt = 0;
@@ -152,10 +168,41 @@ app.controller('eoe_ctrl', function($scope, $http) {
         );
     }
 
+    $scope.add_new_expense = function(){
+        query_url = '/api/add-expense?username='+$scope.username+'&store='+$scope.ne_fromstore+'&amt='+$scope.ne_amount+'&when='+$scope.ne_when+'&reason='+$scope.ne_reason;
+        if($scope.ne_amount <= 0 || $scope.ne_fromstore == "" || $scope.ne_reason == "" || $scope.ne_when == ""){
+            $scope.create_alert('#nealert_placeholder', 'alert-danger', 'Enter proper values!');
+            return;
+        }
+        $http.get(query_url).then(
+            function(response){
+                if(response.data.status == 'success'){
+                    $scope.expenses.recent.push({'reason': $scope.ne_reason, 'amount': $scope.ne_amount, 'fromstore': $scope.ne_fromstore, 'when': new Date($scope.ne_when)});
+                    for(i=0; i<$scope.store_list.stores.length; i++){
+                        if($scope.store_list.stores[i].name == $scope.ne_fromstore){
+                            $scope.store_list.stores[i].balance -= $scope.ne_amount;
+                        }
+                    }
+                    $scope.calculate_totalbalance();
+                    $scope.ne_reason = "";
+                    $scope.ne_amount = 0;
+                    $scope.ne_fromstore = "";
+                    $scope.ne_when = "";
+                    $scope.create_alert('#nealert_placeholder', 'alert-success', 'Expense Successfully Added!');
+                }
+            },
+            function(error){
+                console.log('Error Message: '+error.data.message);
+                $scope.create_alert('#nealert_placeholder', 'alert-danger', 'Add-Expense Failed!');
+            }
+        );
+    }
+
     $scope.create_alert = function(id, type, message){
         $(id).html('<div class="alert '+type+' alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+message+'</div>');
     }
 
     $scope.retrieve_storelist();
+    $scope.retrieve_expenselist();
 });
 

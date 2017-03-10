@@ -20,69 +20,117 @@
                 </div>
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav navbar-right">
-                        <li class="active"><a data-toggle="tab" href="#home">Home</a></li>
-                        <li><a data-toggle="tab" href="#page1">Page 1</a></li>
-                        <li><a data-toggle="tab" href="#page2">Page 2</a></li> 
-                        <li><a data-toggle="tab" href="#page3">Page 3</a></li> 
+                        <li class="active"><a data-toggle="tab" href="#stores">Stores</a></li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Expenses
+                            <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#erecent" data-toggle="tab">Recent</a></li>
+                                <li><a href="#ehistroy"data-toggle="tab">Histroy</a></li> 
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
-            <div class="tab-content">
-                <div id="home" class="tab-pane fade in active">
-                    <button class="btn btn-info" style="float: left !important;" data-toggle="modal" data-target="#addstore">
-                        <span class="glyphicon glyphicon-plus"></span> New Store
-                    </button>
-                    <br/>
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>Store-Name</th>
-                                    <th>Balance</th>
-                                    <th></th>
-                                    <th></th>
+        <div class="tab-content">
+            <div id="stores" class="tab-pane fade in active">
+                <button class="btn btn-info" style="float: left !important;" data-toggle="modal" data-target="#addstore">
+                    <span class="glyphicon glyphicon-plus"></span> New Store
+                </button>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Store-Name</th>
+                                <th>Balance</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="store in store_list.stores">
+                                    <td>{{ store.name }}</td>
+                                    <td style="font-family:consolas;">{{ store.balance }}</td>
+                                    <td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#addbal" ng-click="set_add_balance_store(store.name)">
+                                            <span class="glyphicon glyphicon-plus-sign"></span> Add
+                                        </button>
+                                    </td>
+                                    <td><button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#rmstore" ng-click="set_rm_store(store.name)">
+                                            <span class="glyphicon glyphicon-remove" style="color: red;"></span>
+                                        </button>
+                                    </td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                    <tr ng-repeat="store in store_list.stores">
-                                        <td>{{ store.name }}</td>
-                                        <td style="font-family:consolas;">{{ store.balance }}</td>
-                                        <td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#addbal" ng-click="set_add_balance_store(store.name)">
-                                                <span class="glyphicon glyphicon-plus-sign"></span> Add
-                                            </button>
-                                        </td>
-                                        <td><button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#rmstore" ng-click="set_rm_store(store.name)">
-                                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-xs-7">
-                            <p>Total Balance: <span style="font-family:consolas; font-size: 20; font-weight: bold;">{{total_balance}}</span></p>
-                        </div>
-                        <div class="col-xs-5">
-                            <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#transferbal">
-                                <span class="glyphicon glyphicon-sort"></span> Transfer Balance
-                            </button>
-                        </div>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div id="page1" class="tab-pane fade">
-                    Page1
-                </div>
-                <div id="page2" class="tab-pane fade">
-                    Page2
-                </div>
-                <div id="page3" class="tab-pane fade">
-                    Page3
+                <div class="row">
+                    <div class="col-xs-7">
+                        <p>Total Balance: <span style="font-family:consolas; font-size: 20; font-weight: bold;">{{total_balance}}</span></p>
+                    </div>
+                    <div class="col-xs-5">
+                        <button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#transferbal">
+                            <span class="glyphicon glyphicon-sort"></span> Transfer Balance
+                        </button>
+                    </div>
                 </div>
             </div>
+            <div id="erecent" class="tab-pane fade">
+                <button class="btn btn-success" style="float: left !important;" data-toggle="modal" data-target="#addexpense">
+                    <span class="glyphicon glyphicon-plus"></span> New Expense
+                </button>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Expense</th>
+                                <th>Amount</th>
+                                <th>From</th>
+                                <th>When</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="expense in expenses.recent">
+                                    <td>{{ expense.reason }}</td>
+                                    <td style="font-family:consolas;">{{ expense.amount }}</td>
+                                    <td>{{expense.fromstore}}</td>
+                                    <td style="font-family:consolas;">{{expense.when}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div id="ehistroy" class="tab-pane fade">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>Expense</th>
+                                <th>Amount</th>
+                                <th>From</th>
+                                <th>When</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="expense in expenses.histroy">
+                                    <td>{{ expense.reason }}</td>
+                                    <td style="font-family:consolas;">{{ expense.amount }}</td>
+                                    <td>{{expense.fromstore}}</td>
+                                    <td style="font-family:consolas;">{{expense.when}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="transferbal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -96,7 +144,7 @@
                                 From Store:
                             </div>
                             <div class="col-xs-7">
-                                <select class="input-sm" ng-model="transfer_fromstore">
+                                <select class="form-control" ng-model="transfer_fromstore">
                                     <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
                                 </select>
                             </div>
@@ -107,7 +155,7 @@
                                 To Store:
                             </div>
                             <div class="col-xs-7">
-                                <select class="input-sm" ng-model="transfer_tostore">
+                                <select class="form-control" ng-model="transfer_tostore">
                                     <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
                                 </select>
                             </div>
@@ -118,7 +166,7 @@
                                 Transfer Amount:
                             </div>
                             <div class="col-xs-7">
-                                <input class="input-sm" type="number" ng-model="transfer_amt">
+                                <input class="form-control" type="number" ng-model="transfer_amt">
                             </div>
                         </div>
                         <br/>
@@ -144,7 +192,7 @@
                                 Enter Amount:
                             </div>
                             <div class="col-xs-7">
-                                <input class="input-sm" type="number" ng-model="store_add_amt">
+                                <input class="form-control" type="number" ng-model="store_add_amt">
                             </div>
                         </div>
                         <br/>
@@ -169,7 +217,7 @@
                                 Store Name:
                             </div>
                             <div class="col-xs-7">
-                                <input class="input-sm" type="text" ng-model="new_store_name">
+                                <input class="form-control" type="text" ng-model="new_store_name">
                             </div>
                         </div>
                         <br/>
@@ -178,7 +226,7 @@
                                 Enter Amount:
                             </div>
                             <div class="col-xs-7">
-                                <input class="input-sm" type="number" ng-model="new_store_amt">
+                                <input class="form-control" type="number" ng-model="new_store_amt">
                             </div>
                         </div>
                         <br/>
@@ -199,6 +247,60 @@
                     <div class="modal-footer">
                         <button type="button" data-dismiss="modal" class="btn btn-danger btn-sm" ng-click="delete_store()">Yes</button>
                         <button type="button" data-dismiss="modal" class="btn btn-primary btn-sm">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="addexpense" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New Expense</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Enter Reason:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="form-control" type="text" ng-model="ne_reason">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Select From-Store:
+                            </div>
+                            <div class="col-xs-7">
+                                <select class="form-control" ng-model="ne_fromstore">
+                                    <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Amount:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="form-control" type="number" ng-model="ne_amount">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                When:
+                            </div>
+                            <div class="col-xs-7">
+                                <input type="date" class="form-control" ng-model="ne_when">
+                            </div>
+                        </div>
+                        <br/>
+                        <div id="nealert_placeholder"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default btn-sm" ng-click="add_new_expense()">Add</button>
                     </div>
                 </div>
             </div>
