@@ -6,7 +6,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'EyeOnExpenses' });
 });
 
-router.get('/1', function(req, res, next) {
+router.get('/home', function(req, res, next) {
   //res.render('home', { title: 'EyeOnExpenses' });
   res.sendFile(__dirname+'/home.html');
 });

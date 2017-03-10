@@ -6,6 +6,11 @@ app.controller('eoe_ctrl', function($scope, $http) {
     $scope.transfer_tostore = "";
     $scope.transfer_fromstore = "";
     $scope.transfer_amt = 0;
+    $scope.store_add_amt = 0;
+    $scope.add_balance_store = "";
+    $scope.new_store_name = "";
+    $scope.new_store_amt = 0;
+    $scope.rm_store_name = "";
     $scope.retrieve_storelist = function(){
         $http.get('/api/stores-list?username='+$scope.username).then(
             function(response) {
@@ -24,14 +29,44 @@ app.controller('eoe_ctrl', function($scope, $http) {
         }
     }
 
-    $scope.store_add_balance = function(store){
-        query_url = '/api/store-add-balance?username='+$scope.username+'&store='+store+'&amount'
+    $scope.set_add_balance_store = function(store){
+        $scope.add_balance_store = store;
+    }
+
+    $scope.store_add_balance = function(){
+        console.log($scope.add_balance_store);
+        query_url = '/api/store-add-balance?username='+$scope.username+'&store='+$scope.add_balance_store+'&amt='+$scope.store_add_amt;
+        if($scope.add_balance_store == "" || $scope.store_add_amt <= 0.0){
+            $scope.create_alert('#abalert_placeholder', 'alert-danger', 'enter proper values!');
+            return;
+        }
+        $http.get(query_url).then(
+            function(response){
+                if(response.data.status == 'success'){
+                    for(i=0; i<$scope.store_list.stores.length; i++){
+                        console.log($scope.store_list.stores[i].name+" "+$scope.add_balance_store);
+                        if($scope.store_list.stores[i].name == $scope.add_balance_store){
+                            $scope.store_list.stores[i].balance += $scope.store_add_amt;
+                            console.log($scope.store_list.stores[i].name);
+                        }
+                    }
+                    $scope.store_add_amt = 0;
+                    $scope.create_alert('#abalert_placeholder', 'alert-success', 'Balance successfully added!');
+                }
+            },
+            function(error){
+                $scope.transfer_amt = 0;
+                $scope.transfer_fromstore = "";
+                $scope.transfer_tostore = "";
+                $scope.create_alert('#abalert_placeholder', 'alert-danger', 'Add-Balance-To_store failed!');
+            }
+        );
         $scope.calculate_totalbalance();
     }
 
     $scope.transfer_balance = function(){
         query_url = '/api/store-transfer-balance?username='+$scope.username+'&tostore='+$scope.transfer_tostore+'&fromstore='+$scope.transfer_fromstore+'&amt='+$scope.transfer_amt;
-        if($scope.transfer_fromstore == "" || $scope.transfer_tostore == "" || $scope.transfer_fromstore == $scope.transfer_tostore || $scope.transfer_amt == 0.0){
+        if($scope.transfer_fromstore == "" || $scope.transfer_tostore == "" || $scope.transfer_fromstore == $scope.transfer_tostore || $scope.transfer_amt <= 0.0){
             $scope.create_alert('#tbalert_placeholder', 'alert-danger', 'enter proper values!');
             return;
         }
@@ -60,6 +95,61 @@ app.controller('eoe_ctrl', function($scope, $http) {
             }
         );
         $scope.calculate_totalbalance();
+    }
+
+    $scope.add_new_store = function(){
+        query_url = '/api/add-store?username='+$scope.username+'&store='+$scope.new_store_name+'&balance='+$scope.new_store_amt;
+        if($scope.new_store_name == "" || $scope.new_store_amt <= 0.0){
+            $scope.create_alert('#nsalert_placeholder', 'alert-danger', 'Enter proper values!');
+            return;
+        }
+        $http.get(query_url).then(
+            function(response){
+                if(response.data.status == 'success'){
+                    new_store = {'name': $scope.new_store_name, 'balance': $scope.new_store_amt};
+                    $scope.store_list.stores.push(new_store);
+                    $scope.new_store_amt = 0;
+                    $scope.new_store_name = "";
+                    $scope.calculate_totalbalance();
+                    $scope.create_alert('#nsalert_placeholder', 'alert-success', 'Balance successfully transfered!');
+                }
+            },
+            function(error){
+                $scope.new_store_amt = 0;
+                $scope.new_store_name = "";
+                $scope.create_alert('#nsalert_placeholder', 'alert-danger', 'Add-Store Failed!');
+            }
+        );
+    }
+
+    $scope.set_rm_store = function(store){
+        $scope.rm_store_name = store;
+    }
+
+    $scope.delete_store = function(){
+        query_url = '/api/remove-store?username='+$scope.username+'&store='+$scope.rm_store_name;
+        if($scope.rm_store_name == ""){
+            $scope.create_alert('#alert_placeholder', 'alert-danger', 'improper values!');
+            return;
+        }
+        $http.get(query_url).then(
+            function(response){
+                for(i=0; i<$scope.store_list.stores.length; i++){
+                    if($scope.store_list.stores[i].name == $scope.rm_store_name){
+                        is_available_flag = true;
+                        $scope.store_list.stores.splice(i, 1);
+                        break;
+                    }
+                }
+                $scope.rm_store_name = "";
+                $scope.calculate_totalbalance();
+                $scope.create_alert('#alert_placeholder', 'alert-success', 'Store Successfully Removed!');
+            },
+            function(error){
+                console.log("Error Message: "+error.data.message);
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Store-Remove Failed!');
+            }
+        );
     }
 
     $scope.create_alert = function(id, type, message){

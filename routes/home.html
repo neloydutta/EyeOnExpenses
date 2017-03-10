@@ -30,6 +30,10 @@
         </nav>
             <div class="tab-content">
                 <div id="home" class="tab-pane fade in active">
+                    <button class="btn btn-info" style="float: left !important;" data-toggle="modal" data-target="#addstore">
+                        <span class="glyphicon glyphicon-plus"></span> New Store
+                    </button>
+                    <br/>
                     <div class="row">
                         <div class="col-xs-12">
                             <table class="table table-hover">
@@ -38,14 +42,19 @@
                                     <th>Store-Name</th>
                                     <th>Balance</th>
                                     <th></th>
+                                    <th></th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="store in store_list.stores">
                                         <td>{{ store.name }}</td>
                                         <td style="font-family:consolas;">{{ store.balance }}</td>
-                                        <td><button type="button" class="btn btn-default btn-sm" id={{store.name}} data-toggle="modal" data-target="#addbal" ng-click="add_balance_store = store.name">
+                                        <td><button type="button" class="btn btn-default btn-sm" data-toggle="modal" data-target="#addbal" ng-click="set_add_balance_store(store.name)">
                                                 <span class="glyphicon glyphicon-plus-sign"></span> Add
+                                            </button>
+                                        </td>
+                                        <td><button type="button" class="btn btn-link btn-sm" data-toggle="modal" data-target="#rmstore" ng-click="set_rm_store(store.name)">
+                                                <span class="glyphicon glyphicon-remove" style="color: red;"></span>
                                             </button>
                                         </td>
                                     </tr>
@@ -130,10 +139,66 @@
                         <h4 class="modal-title">Add Balance to Store</h4>
                     </div>
                     <div class="modal-body">
-                        <p>Some text in the modal.</p>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Enter Amount:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="input-sm" type="number" ng-model="store_add_amt">
+                            </div>
+                        </div>
+                        <br/>
+                        <div id="abalert_placeholder"></div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-default" ng-click="transfer_balance()">Add</button>
+                        <button type="button" class="btn btn-default" ng-click="store_add_balance()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="addstore" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New Store</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Store Name:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="input-sm" type="text" ng-model="new_store_name">
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                Enter Amount:
+                            </div>
+                            <div class="col-xs-7">
+                                <input class="input-sm" type="number" ng-model="new_store_amt">
+                            </div>
+                        </div>
+                        <br/>
+                        <div id="nsalert_placeholder"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" ng-click="add_new_store()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="rmstore" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p>Are you sure about removing this store?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-danger btn-sm" ng-click="delete_store()">Yes</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary btn-sm">No</button>
                     </div>
                 </div>
             </div>
