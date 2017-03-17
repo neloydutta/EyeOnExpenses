@@ -5,7 +5,7 @@ var dbsetup = require('../dbsetup');
 var db = dbsetup.db;
 var store = mongoose.model('store', dbsetup.storeSchema);
 var expense = mongoose.model('expense', dbsetup.expenseSchema);
-
+var log = mongoose.model('log', dbsetup.logSchema); 
 
 router.get('/store-add-balance', function(req, res){
     query = req.query; //Query string: username=&store=&amt=
@@ -26,7 +26,7 @@ router.get('/store-add-balance', function(req, res){
                                 //store_list[i].balance += parseInt(query.amt);
                                 store_res[0].stores[i].balance += parseInt(query.amt);
                                 store_res.visits.$inc();
-                                store_res.save()
+                                store_res.save();
                                 break;
                             }
                         }
@@ -36,8 +36,28 @@ router.get('/store-add-balance', function(req, res){
                             res.status(400).json({'status': 'failure', 'message': 'invalid store'});
                         }
                         else{
-                            res.statusMessage = 'Yay!';
-                            res.status(200).json({'status': 'success'});
+                            log.find({username: query.username}, function(err, log_res){
+                                if(err){
+                                    console.log('DB Fetch error!');
+                                    console.log(err);
+                                    res.statusMessage = 'Oops!';
+                                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                                }
+                                else{
+                                    if(log_res.length > 0){
+                                        log_res[0].log.push({'store': query.store, 'type': 'credit', 'amount': query.amt, 'when': new Date(), 'reason': 'Store credit' });
+                                        log_res.visits.$inc();
+                                        log_res.save();
+                                        res.statusMessage = 'Yay!';
+                                        res.status(200).json({'status': 'success'});
+                                    }
+                                    else{
+                                        console.log('DB Fetch error! (Probable cause: Invalid username)');
+                                        res.statusMessage = 'Oops!';
+                                        res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                                    }
+                                }
+                            });
                         }
                     }
                     else{
@@ -104,8 +124,28 @@ router.get('/add-expense', function(req, res){
                                             eres[0].recent.push({'reason': query.reason, 'amount': query.amt, 'fromstore': query.store, 'when': new Date(query.when)});
                                             eres.visits.$inc();
                                             eres.save();
-                                            res.statusMessage = 'Yay!';
-                                            res.status(200).json({'status': 'success'});
+                                            log.find({username: query.username}, function(err, log_res){
+                                                if(err){
+                                                    console.log('DB Fetch error!');
+                                                    console.log(err);
+                                                    res.statusMessage = 'Oops!';
+                                                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                                                }
+                                                else{
+                                                    if(log_res.length > 0){
+                                                        log_res[0].log.push({'store': query.store, 'type': 'debit', 'amount': query.amt, 'when': new Date(query.when), 'reason': query.reason });
+                                                        log_res.visits.$inc();
+                                                        log_res.save();
+                                                        res.statusMessage = 'Yay!';
+                                                        res.status(200).json({'status': 'success'});
+                                                    }
+                                                    else{
+                                                        console.log('DB Fetch error! (Probable cause: Invalid username)');
+                                                        res.statusMessage = 'Oops!';
+                                                        res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                                                    }
+                                                }
+                                            });
                                         }
                                     });
                                     break;
@@ -175,6 +215,29 @@ router.get('/store-transfer-balance', function(req, res){
                                     store_res.save();
                                     res.statusMessage = 'Yay!';
                                     res.status(200).json({'status': 'success'});
+                                    log.find({username: query.username}, function(err, log_res){
+                                        if(err){
+                                            console.log('DB Fetch error!');
+                                            console.log(err);
+                                            res.statusMessage = 'Oops!';
+                                            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                                        }
+                                        else{
+                                            if(log_res.length > 0){
+                                                log_res[0].log.push({'store': query.fromstore, 'type': 'debit', 'amount': query.amt, 'when': new Date(), 'reason': 'store credit transfer to '+query.tostore });
+                                                log_res[0].log.push({'store': query.tpstore, 'type': 'credit', 'amount': query.amt, 'when': new Date(), 'reason': 'store credit transfer from '+query.fromstore });
+                                                log_res.visits.$inc();
+                                                log_res.save();
+                                                res.statusMessage = 'Yay!';
+                                                res.status(200).json({'status': 'success'});
+                                            }
+                                            else{
+                                                console.log('DB Fetch error! (Probable cause: Invalid username)');
+                                                res.statusMessage = 'Oops!';
+                                                res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                                            }
+                                        }
+                                    });   
                                 }
                                 else{
                                     console.log('Bad request by user! (Probable cause: Insufficient balance)');
@@ -382,7 +445,87 @@ router.get('/expenses-list', function(req, res){
             console.log('DB setup error!');
             res.statusMessage = 'Oops!';
             //res.status(500).json({'status': 'failure', 'message': 'internal server error'});
-            res.json({'username': 'Ironman', 'recent': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}], 'histroy': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}]})
+            res.json({'username': 'Ironman', 'recent': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}], 'history': [{'reason': 'for no reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}, {'reason': 'for some reason', 'amount': 200, 'when': new Date(), 'fromstore': 'wallet'}]})
+        }
+    }
+    else{
+        console.log('Bad request by user! (probable cause: insufficient parameters)');
+        res.statusMessage = 'Oops!';
+        res.status(400).json({'status': 'failure', 'message': 'insufficient parameters'});
+    }
+});
+
+router.get('/reset-recent', function(req, res){
+    query = req.query;
+    if(query.username){
+        if(dbsetup.status){
+            console.log(dbsetup);
+            expense.find({username: query.username}, function(err, exp_res){
+                if(err){
+                    console.log('DB Fetch error!');
+                    console.log(err);
+                    res.statusMessage = 'Oops!';
+                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                }
+                else{
+                    if(exp_res.length>0){
+                        exp_res[0].history.push.apply(exp_res[0].history, exp_res[0].recent);
+                        exp_res[0].recent = [];
+                        exp_res.visits.$inc();
+                        exp_res.save();
+                        res.statusMessage = "Yay!";
+                        res.status(200).json({'status': 'success'});
+                    }
+                    else{
+                        console.log('DB Fetch error! (Probable cause: Invalid username)');
+                        res.statusMessage = 'Oops!';
+                        res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                    }
+                }
+            });
+        }
+        else{
+            console.log('DB setup error!');
+            res.statusMessage = 'Oops!';
+            //res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+            res.json({'status': 'success'});
+        }
+    }
+    else{
+        console.log('Bad request by user! (probable cause: insufficient parameters)');
+        res.statusMessage = 'Oops!';
+        res.status(400).json({'status': 'failure', 'message': 'insufficient parameters'});
+    }
+});
+
+router.get('/statement', function(req, res, next){
+    query = req.query;
+    if(query.username){
+        if(dbsetup.status){
+            log.find({username: query.username}, function(err, log_res){
+                if(err){
+                    console.log('DB Fetch error!');
+                    console.log(err);
+                    res.statusMessage = 'Oops!';
+                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                }
+                else{
+                    if(log_res.length > 0){
+                        res.statusMessage = 'Yay!';
+                        res.status(200).json({'status': 'success', 'log': log_res});
+                    }
+                    else{
+                        console.log('DB Fetch error! (Probable cause: Invalid username)');
+                        res.statusMessage = 'Oops!';
+                        res.status(400).json({'status': 'failure', 'message': 'invalid user'});
+                    }
+                }
+            });
+        }
+        else{
+            console.log('DB Setup error!');
+            res.statusMessage = 'Oops!';
+            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
         }
     }
     else{

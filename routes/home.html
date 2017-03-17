@@ -6,6 +6,8 @@
         <script src="/javascripts/bootstrap.min.js"></script>
         <script src="/javascripts/angular.min.js"></script>
         <script src="/javascripts/home_front_script.js"></script>
+        <script src="/javascripts/jquery-ui.min.js"></script>
+        <link href="/css/jquery-ui.min.css" rel="stylesheet">
     </head>
     <body class="container-fluid" ng-app="eoe_app" ng-controller="eoe_ctrl" id="body">
         <nav class="navbar navbar-inverse">
@@ -21,12 +23,13 @@
                 <div class="collapse navbar-collapse" id="myNavbar">
                     <ul class="nav navbar-nav navbar-right">
                         <li class="active"><a data-toggle="tab" href="#stores">Stores</a></li>
+                        <li><a data-toggle="tab" href="#statement">Statement</a></li>
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Expenses
                             <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="#erecent" data-toggle="tab">Recent</a></li>
-                                <li><a href="#ehistroy"data-toggle="tab">Histroy</a></li> 
+                                <li><a href="#ehistory"data-toggle="tab">history</a></li> 
                             </ul>
                         </li>
                     </ul>
@@ -78,9 +81,48 @@
                     </div>
                 </div>
             </div>
+            <div id="statement" class="tab-pane fade">
+                <div class="row" id="printhidden">
+                    <div class="col-xs-7">
+                        <select style="float: left !important;" class="form-control sm" ng-model="statement_store" ng-change="update_dlog()">
+                            <option ng-repeat="store in store_list.stores" value="{{store.name}}" >{{store.name}}</option>
+                        </select>
+                    </div>
+                    <div class="col-xs-5">
+                        <button style="float: right !important;" class="btn btn-default" onclick="window.print()">
+                            <span class="glyphicon glyphicon-print"></span>
+                        </button>
+                    </div>
+                </div>
+                <div id="statement_display">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Store</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>When</th>
+                                <th>Why</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="log in dlog_list">
+                                <td>{{log.store}}</td>
+                                <td style="font-family:consolas;">{{log.amount}}</td>
+                                <td>{{log.type}}</td>
+                                <td>{{log.when}}</td>
+                                <td>{{log.reason}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <div id="erecent" class="tab-pane fade">
                 <button class="btn btn-success" style="float: left !important;" data-toggle="modal" data-target="#addexpense">
                     <span class="glyphicon glyphicon-plus"></span> New Expense
+                </button>
+                <button class="btn btn-danger" style="float: right !important;" data-toggle="modal" data-target="#resetrecent">
+                    <span class="glyphicon glyphicon-refresh"></span> Reset Recent
                 </button>
                 <br/>
                 <div class="row">
@@ -106,7 +148,7 @@
                     </div>
                 </div>
             </div>
-            <div id="ehistroy" class="tab-pane fade">
+            <div id="ehistory" class="tab-pane fade">
                 <div class="row">
                     <div class="col-xs-12">
                         <table class="table table-hover">
@@ -119,7 +161,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="expense in expenses.histroy">
+                                <tr ng-repeat="expense in expenses.history">
                                     <td>{{ expense.reason }}</td>
                                     <td style="font-family:consolas;">{{ expense.amount }}</td>
                                     <td>{{expense.fromstore}}</td>
@@ -293,7 +335,7 @@
                                 When:
                             </div>
                             <div class="col-xs-7">
-                                <input type="date" class="form-control" ng-model="ne_when">
+                                <input type="text" id="datepicker" placeholder="MM-DD-YYYY" class="form-control" ng-model="ne_when">
                             </div>
                         </div>
                         <br/>
@@ -301,6 +343,19 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-default btn-sm" ng-click="add_new_expense()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="resetrecent" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p>Are you sure about resetting recent expenses?<br/><br/>**These expenses will be moved to history and will still be available there for you!**</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" data-dismiss="modal" class="btn btn-danger btn-sm" ng-click="reset_recent()">Yes</button>
+                        <button type="button" data-dismiss="modal" class="btn btn-primary btn-sm">No</button>
                     </div>
                 </div>
             </div>

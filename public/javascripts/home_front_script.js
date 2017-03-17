@@ -16,6 +16,8 @@ app.controller('eoe_ctrl', function($scope, $http) {
     $scope.ne_fromstore = "";
     $scope.ne_when = "";
     $scope.expenses = {};
+    $scope.log = {}
+    $scope.dlog = []
     $scope.retrieve_storelist = function(){
         $http.get('/api/stores-list?username='+$scope.username).then(
             function(response) {
@@ -23,7 +25,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 $scope.calculate_totalbalance();
             },
             function(error){
-                console.log(error.data.message);
+                console.log("Error Message: "+error.data.message);
                 $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Something doesn\'t seem to be right!');
         });
     }
@@ -32,10 +34,9 @@ app.controller('eoe_ctrl', function($scope, $http) {
         $http.get('/api/expenses-list?username='+$scope.username).then(
             function(response) {
                 $scope.expenses = response.data;
-                console.log($scope.expenses);
             },
             function(error){
-                console.log(error.data.message);
+                console.log("Error Message: "+error.data.message);
                 $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Something doesn\'t seem to be right!');
         });
     }
@@ -52,7 +53,6 @@ app.controller('eoe_ctrl', function($scope, $http) {
     }
 
     $scope.store_add_balance = function(){
-        console.log($scope.add_balance_store);
         query_url = '/api/store-add-balance?username='+$scope.username+'&store='+$scope.add_balance_store+'&amt='+$scope.store_add_amt;
         if($scope.add_balance_store == "" || $scope.store_add_amt <= 0.0){
             $scope.create_alert('#abalert_placeholder', 'alert-danger', 'enter proper values!');
@@ -198,11 +198,60 @@ app.controller('eoe_ctrl', function($scope, $http) {
         );
     }
 
+    $scope.reset_recent = function(){
+        query_url = '/api/reset-recent?username='+$scope.username;
+        $http.get(query_url).then(
+            function(response){
+                if(response.data.status == 'success'){
+                    $scope.expenses.history.push.apply($scope.expenses.history, $scope.expenses.recent);
+                    $scope.expenses.recent = [];
+                    $scope.create_alert('#alert_placeholder', 'alert-success', 'Reset-Recent-Expense, Successfull!');
+                }
+            },
+            function(error){
+                console.log('Error Message: '+error.data.message);
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Reset-Recent-Expense, Failed!');
+            }
+        );
+    }
+
+    $scope.retrieve_log = function(){
+        query_url = '/api/statement?username='+$scope.username;
+        $http.get(query_url).then(
+            function(response){
+                $scope.log = response.data;
+                $scope.dlog = $scope.log.log;
+            },
+            function(error){
+                console.log("Error Message: "+error.data.message);
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Something doesn\'t seem to be right!');
+            }
+        );
+    }
+
     $scope.create_alert = function(id, type, message){
-        $(id).html('<div class="alert '+type+' alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+message+'</div>');
+        $(id).append('<div class="alert '+type+' alert-dismissable fade in"><a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>'+message+'</div>');
+        var id = id.slice(1);
+        setTimeout(function doYourThing(){
+            var node = document.getElementById(id);
+            node.removeChild(node.firstChild);
+        }, 10000);
+    }
+
+    $scope.update_dlog = function(){
+        $scope.dlog = [];
+        for(i=0; i<$scope.log.log.length; i++){
+            if($scope.log.log[i]['store'] == $scope.statement_store){
+                $scope.dlog.append($scope.log.log[i]);
+            }
+        }
     }
 
     $scope.retrieve_storelist();
     $scope.retrieve_expenselist();
+    $scope.retrieve_log();
 });
 
+$(function() {
+    $("#datepicker").datepicker({ dateFormat: 'mm-dd-yy' });
+});
