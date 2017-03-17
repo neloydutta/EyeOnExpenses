@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>EyeOnExpenses</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css"/>
+    <script src="/javascripts/jquery-3.1.1.min.js"></script>
+    <script src="/javascripts/bootstrap.min.js"></script>
+    <script src="/javascripts/angular.min.js"></script>
+    <script src="/javascripts/auth_front_script.js"></script>
+</head>
+<body ng-app="eoeauth_app" ng-controller="eoeauth_ctrl">
+    <h3 align="middle">EyeOnExpenses</h3>
+    <div class="container">
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#login">Sign In</a></li>
+            <li><a data-toggle="tab" href="#signup">Sign Up</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="login" class="tab-pane fade in active">
+                <br/>
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">username</div>
+                    <div class="col-xs-7">
+                        <input type="text" class="form-control sm" ng-model="lusername" required/>
+                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">password</div>
+                    <div class="col-xs-7">
+                        <input type="password" class="form-control sm" ng-model="lpassword" required/>
+                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <br/>
+                <input type="button" value="Sign In" class="btn-primary btn" style="display: block; margin: 0 auto;width: 50%;" ng-click="dosignin()">
+            </div>
+            <div id="signup" class="tab-pane fade">
+                <br/>
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">username</div>
+                    <div class="col-xs-7">
+                        <div class="form-group has-success has-feedback">
+                            <input type="text" class="form-control sm" ng-model="susername" ng-hide="!isavailable" ng-change="checkavailability()" required/>
+                            <span ng-hide="!isavailable" class="glyphicon glyphicon-ok form-control-feedback"></span>
+                        </div>
+                        <div class="form-group has-error has-feedback">
+                            <input type="text" class="form-control sm" ng-model="susername" ng-hide="isavailable" ng-change="checkavailability()" required/>
+                            <span ng-hide="isavailable" class="glyphicon glyphicon-remove form-control-feedback"></span>
+                        </div>
+                    </div>
+                    <div class="col-xs-1">
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">password</div>
+                    <div class="col-xs-7">
+                        <input type="password" class="form-control sm" ng-model="spassword" required/>
+                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-xs-1"></div>
+                    <div class="col-xs-3">confirm password</div>
+                    <div class="col-xs-7">
+                        <input type="password" class="form-control sm" ng-model="scpassword" required/>
+                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <br/>
+                <input type="button" value="Sign Up" class="btn-primary btn" style="display: block; margin: 0 auto;width: 50%;" ng-click="dosignup()">
+            </div>
+        </div>
+    </div>
+    <div id="alert_placeholder"></div>
+</body>
+</html>
