@@ -1,14 +1,14 @@
 var mongoose = require('mongoose')
 var secrets = require('./secrets.js')
 // Database setup
-
-var status = false;
-mongoose.connect('mongodb://'+secrets.dbusername+':'+secrets.dbpassword+'@ds058369.mlab.com:58369/eyeonexpenses');
+var status = true;
+//mongoose.connect('mongodb://'+secrets.dbusername+':'+secrets.dbpassword+'@ds058369.mlab.com:58369/eyeonexpenses');
+mongoose.connect('mongodb://localhost:27017/eyeonexpenses');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
-    console.log('DB Connection successfull!');
     status = true;
+    console.log('DB Connection successfull!');
 });
 
 var storeSchema = new mongoose.Schema({

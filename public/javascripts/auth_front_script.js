@@ -14,14 +14,24 @@ app.controller('eoeauth_ctrl', function($scope, $http) {
 
     }
     $scope.checkavailability = function(){
+        if($scope.susername == undefined){
+            $scope.isavailable = false;
+            document.getElementById("udiv").setAttribute("class", "form-group has-error has-feedback");
+            document.getElementById("uspan").setAttribute("class", "glyphicon glyphicon-remove form-control-feedback");
+            return;
+        }
         $http.get('/auth/useravailcheck?username='+$scope.susername).then(
             function(response){
                 if(response.data.status == "success"){
                     if(response.data.availability){
                         $scope.isavailable = true;
+                        document.getElementById("udiv").setAttribute("class", "form-group has-success has-feedback");
+                        document.getElementById("uspan").setAttribute("class", "glyphicon glyphicon-ok form-control-feedback");
                     }
                     else{
                         $scope.isavailable = false;
+                        document.getElementById("udiv").setAttribute("class", "form-group has-error has-feedback");
+                        document.getElementById("uspan").setAttribute("class", "glyphicon glyphicon-remove form-control-feedback");
                     }
                 }
             },

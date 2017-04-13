@@ -14,7 +14,7 @@ router.get('/useravailcheck', function(req, res){
                     console.log('DB Fetch error!');
                     console.log(err);
                     res.statusMessage = 'Oops!';
-                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                    res.status(502).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
                     if(user_res.length == 0){
@@ -29,7 +29,7 @@ router.get('/useravailcheck', function(req, res){
         else{
             console.log('DB Setup error!');
             res.statusMessage = 'Oops!';
-            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
         }
     }
     else{
@@ -47,7 +47,7 @@ router.post('/login', function(req, res){
                     console.log('DB Fetch error!');
                     console.log(err);
                     res.statusMessage = 'Oops!';
-                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                    res.status(502).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else if(user_res.length == 1){
                     if(req.body.password == user_res[0].password){
@@ -69,7 +69,7 @@ router.post('/login', function(req, res){
         else{
             console.log('DB Setup error!');
             res.statusMessage = 'Oops!';
-            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
         }
     }
     else{
@@ -90,7 +90,7 @@ router.post('/signup', function(req, res){
                 if(err){
                     console.log(err);
                     res.statusMessage = 'Oops!';
-                    res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+                    res.status(502).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
                     console.log("User registered: "+user.username);
@@ -102,7 +102,7 @@ router.post('/signup', function(req, res){
         else{
             console.log('DB Setup error!');
             res.statusMessage = 'Oops!';
-            res.status(500).json({'status': 'failure', 'message': 'internal server error'});
+            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
         }
     }
     else{
