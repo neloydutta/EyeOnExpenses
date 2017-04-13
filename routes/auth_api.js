@@ -39,7 +39,7 @@ router.get('/useravailcheck', function(req, res){
     }
 });
 
-router.post('/login', function(req, res){
+router.post('/signin', function(req, res){
     if(req.body.username && req.body.password){
         if(dbsetup.status){
             user.find({'username': req.body.username}, function(err, user_res){
@@ -82,18 +82,18 @@ router.post('/login', function(req, res){
 router.post('/signup', function(req, res){
     if(req.body.username && req.body.password){
         if(dbsetup.status){
-           var user = new user({
+           var new_user = new user({
                 username: req.body.username,
                 password: req.body.password
            });
-           user.save(function(err, user){
+           new_user.save(function(err, user_res){
                 if(err){
                     console.log(err);
                     res.statusMessage = 'Oops!';
                     res.status(502).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
-                    console.log("User registered: "+user.username);
+                    console.log("User registered: "+new_user.username);
                     res.statusMessage = 'Yay!';
                     res.status(200).json({'status': 'success'});
                 }
