@@ -106,7 +106,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="log in dlog_list">
+                            <tr ng-repeat="log in dlog">
                                 <td>{{log.store}}</td>
                                 <td style="font-family:consolas;">{{log.amount}}</td>
                                 <td>{{log.type}}</td>
@@ -137,7 +137,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="expense in expenses.recent">
+                                <tr ng-repeat="expense in expenses.expense_cur">
                                     <td>{{ expense.reason }}</td>
                                     <td style="font-family:consolas;">{{ expense.amount }}</td>
                                     <td>{{expense.fromstore}}</td>
@@ -161,7 +161,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                                <tr ng-repeat="expense in expenses.history">
+                                <tr ng-repeat="expense in expenses.expense_history">
                                     <td>{{ expense.reason }}</td>
                                     <td style="font-family:consolas;">{{ expense.amount }}</td>
                                     <td>{{expense.fromstore}}</td>

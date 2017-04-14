@@ -4,6 +4,9 @@ var router = express.Router();
 var dbsetup = require('../dbsetup');
 var db = dbsetup.db;
 var user = mongoose.model('user', dbsetup.userSchema);
+var store = mongoose.model('store', dbsetup.storeSchema);
+var expense = mongoose.model('expense', dbsetup.expenseSchema);
+var log = mongoose.model('log', dbsetup.log);
 
 router.get('/useravailcheck', function(req, res){
     query = req.query;
@@ -93,6 +96,40 @@ router.post('/signup', function(req, res){
                     res.status(502).json({'status': 'failure', 'message': 'internal server error'});
                 }
                 else{
+                    var new_ustore = new store({
+                        username: req.body.username,
+                        stores: []
+                    });
+                    new_ustore.save(function(err, nstore_res){
+                        if(err){
+                            console.log(err);
+                            res.statusMessage = 'Oops!';
+                            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
+                        }
+                    });
+                    var new_uexpense = new expense({
+                        username: req.body.username,
+                        expense_cur: [],
+                        expense_history: []
+                    });
+                    new_uexpense.save(function(err, nexpense_res){
+                        if(err){
+                            console.log(err);
+                            res.statusMessage = 'Oops!';
+                            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
+                        }
+                    });
+                    var new_ulog = new log({
+                        username: req.body.username,
+                        log: []
+                    });
+                    new_ulog.save(function(err, nlog_res){
+                        if(err){
+                            console.log(err);
+                            res.statusMessage = 'Oops!';
+                            res.status(502).json({'status': 'failure', 'message': 'internal server error'});
+                        }
+                    });
                     console.log("User registered: "+new_user.username);
                     res.statusMessage = 'Yay!';
                     res.status(200).json({'status': 'success'});

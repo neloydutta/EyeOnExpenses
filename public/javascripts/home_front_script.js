@@ -1,7 +1,7 @@
 var app = angular.module('eoe_app', []);
 app.controller('eoe_ctrl', function($scope, $http) {
     $scope.store_list = {};
-    $scope.username = 'ironman';
+    $scope.username = '';
     $scope.total_balance = 0;
     $scope.transfer_tostore = "";
     $scope.transfer_fromstore = "";
@@ -44,7 +44,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
     $scope.calculate_totalbalance = function(){
         $scope.total_balance = 0;
         for(i=0; i<$scope.store_list.stores.length; i++){
-            $scope.total_balance += $scope.store_list.stores[i].balance;
+            $scope.total_balance += parseInt($scope.store_list.stores[i].balance);
         }
     }
 
@@ -63,7 +63,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 if(response.data.status == 'success'){
                     for(i=0; i<$scope.store_list.stores.length; i++){
                         if($scope.store_list.stores[i].name == $scope.add_balance_store){
-                            $scope.store_list.stores[i].balance += $scope.store_add_amt;
+                            $scope.store_list.stores[i].balance = parseInt($scope.store_list.stores[i].balance) + $scope.store_add_amt;
                         }
                     }
                     $scope.store_add_amt = 0;
@@ -91,10 +91,10 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 if(response.data.status == 'success'){
                     for(i=0; i<$scope.store_list.stores.length; i++){
                         if($scope.store_list.stores[i].name == $scope.transfer_fromstore){
-                            $scope.store_list.stores[i].balance -= $scope.transfer_amt;
+                            $scope.store_list.stores[i].balance = parseInt($scope.store_list.stores[i].balance) - $scope.transfer_amt;
                         }
                         if($scope.store_list.stores[i].name == $scope.transfer_tostore){
-                            $scope.store_list.stores[i].balance += $scope.transfer_amt;
+                            $scope.store_list.stores[i].balance = parseInt($scope.store_list.stores[i].balance) + $scope.transfer_amt;
                         }
                     }
                     $scope.transfer_amt = 0;
@@ -127,7 +127,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
                     $scope.new_store_amt = 0;
                     $scope.new_store_name = "";
                     $scope.calculate_totalbalance();
-                    $scope.create_alert('#nsalert_placeholder', 'alert-success', 'Balance successfully transfered!');
+                    $scope.create_alert('#nsalert_placeholder', 'alert-success', 'Store successfully added!');
                 }
             },
             function(error){
@@ -177,7 +177,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
         $http.get(query_url).then(
             function(response){
                 if(response.data.status == 'success'){
-                    $scope.expenses.recent.push({'reason': $scope.ne_reason, 'amount': $scope.ne_amount, 'fromstore': $scope.ne_fromstore, 'when': new Date($scope.ne_when)});
+                    $scope.expenses.expense_cur.push({'reason': $scope.ne_reason, 'amount': $scope.ne_amount, 'fromstore': $scope.ne_fromstore, 'when': new Date($scope.ne_when)});
                     for(i=0; i<$scope.store_list.stores.length; i++){
                         if($scope.store_list.stores[i].name == $scope.ne_fromstore){
                             $scope.store_list.stores[i].balance -= $scope.ne_amount;
@@ -203,8 +203,8 @@ app.controller('eoe_ctrl', function($scope, $http) {
         $http.get(query_url).then(
             function(response){
                 if(response.data.status == 'success'){
-                    $scope.expenses.history.push.apply($scope.expenses.history, $scope.expenses.recent);
-                    $scope.expenses.recent = [];
+                    $scope.expenses.expense_history.push.apply($scope.expenses.expense_history, $scope.expenses.expense_cur);
+                    $scope.expenses.expense_cur = [];
                     $scope.create_alert('#alert_placeholder', 'alert-success', 'Reset-Recent-Expense, Successfull!');
                 }
             },
@@ -219,8 +219,9 @@ app.controller('eoe_ctrl', function($scope, $http) {
         query_url = '/api/statement?username='+$scope.username;
         $http.get(query_url).then(
             function(response){
-                $scope.log = response.data;
+                $scope.log = response.data.log[0];
                 $scope.dlog = $scope.log.log;
+                console.log($scope.dlog);
             },
             function(error){
                 console.log("Error Message: "+error.data.message);
@@ -242,11 +243,18 @@ app.controller('eoe_ctrl', function($scope, $http) {
         $scope.dlog = [];
         for(i=0; i<$scope.log.log.length; i++){
             if($scope.log.log[i]['store'] == $scope.statement_store){
-                $scope.dlog.append($scope.log.log[i]);
+                $scope.dlog.push($scope.log.log[i]);
             }
         }
     }
 
+    $scope.retrieve_username = function(){
+        var url = window.location.href;
+        url = url.split('/');
+        $scope.username = url[url.length - 1];
+        console.log($scope.username);
+    } 
+    $scope.retrieve_username();
     $scope.retrieve_storelist();
     $scope.retrieve_expenselist();
     $scope.retrieve_log();

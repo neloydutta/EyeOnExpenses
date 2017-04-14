@@ -33,9 +33,10 @@ app.controller('eoeauth_ctrl', function($scope, $http) {
         if($scope.lusername && $scope.lpassword){
             $http.post('/auth/signin', { username: $scope.lusername, password: $scope.lpassword}).then(
                 function(response){
+                    $scope.create_alert('#alert_placeholder', 'alert-success', 'Sign-In Successfull!');
+                    window.location.href = "/"+$scope.lusername;
                     $scope.lusername = "";
                     $scope.lpassword = "";
-                    $scope.create_alert('#alert_placeholder', 'alert-success', 'Sign-In Successfull!');
                 },
                 function(error){
                     console.log(error.data.message);
