@@ -150,6 +150,7 @@ router.post('/signup', function(req, res){
 });
 
 router.post('/logout', function(req, res){
+    var username = req.session.user;
     req.session.destroy(function(err){
         if(err){
             console.log('Error in logout!');
@@ -158,7 +159,7 @@ router.post('/logout', function(req, res){
             res.status(200).json({'status': 'failure'});   
         }
         else{
-            console.log("User Logged-out: "+user.username);
+            console.log("User Logged-out: "+username);
             res.statusMessage = 'Yay!';
             res.status(200).json({'status': 'success'});
         }

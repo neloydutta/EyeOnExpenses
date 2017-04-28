@@ -12,6 +12,8 @@ var auth_api = require('./routes/auth_api');
 
 var app = express();
 
+var port = process.env.PORT || 3000;
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -47,6 +49,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.listen(3000, function () {
+app.listen(port, function () {
   console.log('EyeOnExpenses app listening on port 3000!')
-})
+});
+
+module.exports = app;

@@ -11,7 +11,7 @@ router.get('/store-add-balance', function(req, res){
     query = req.query; //Query string: username=&store=&amt=
     //console.log(query)
     if(query.store && query.amt && query.username){
-        if(req.session.user == undefined || req.session.user == query.username){
+        if(req.session.user == undefined || req.session.user != query.username){
             res.statusMessage = 'Oops!';
             res.status(400).json({'status': 'failure', 'message': 'invalid request'});
         }
