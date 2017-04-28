@@ -254,6 +254,19 @@ app.controller('eoe_ctrl', function($scope, $http) {
         $scope.username = url[url.length - 1];
         console.log($scope.username);
     } 
+
+    $scope.logout = function(){
+        $http.post('/auth/logout').then(
+            function(response){
+                $scope.create_alert('#alert_placeholder', 'alert-success', 'Successfully logged out!');
+                window.location.href = '/';
+            },
+            function(error){
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Logout was\'nt successfull!');
+            }
+        );
+    }
+
     $scope.retrieve_username();
     $scope.retrieve_storelist();
     $scope.retrieve_expenselist();
