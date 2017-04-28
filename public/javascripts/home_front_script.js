@@ -74,7 +74,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 $scope.transfer_amt = 0;
                 $scope.transfer_fromstore = "";
                 $scope.transfer_tostore = "";
-                $scope.create_alert('#abalert_placeholder', 'alert-danger', 'Add-Balance-To_store failed!');
+                $scope.create_alert('#abalert_placeholder', 'alert-danger', 'Add-Balance-To-store failed!');
             }
         );
         $scope.calculate_totalbalance();
@@ -262,7 +262,7 @@ app.controller('eoe_ctrl', function($scope, $http) {
                 window.location.href = '/';
             },
             function(error){
-                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Logout was\'nt successfull!');
+                $scope.create_alert('#alert_placeholder', 'alert-danger', 'Oops! Logout wasn\'t successfull!');
             }
         );
     }
